@@ -7,6 +7,8 @@ import { useHistory } from 'react-router-dom';
 import { AuthContext } from "../service/authentication";
 import { api } from "../util/api";
 import { getAllDiscussionPosts, deletePost, getAllDiscussionComments } from "../util/user"
+import { AiFillDelete,AiFillEdit } from "react-icons/ai";
+
 
 
 export const MessageComments = (props) => {
@@ -36,9 +38,9 @@ export const MessageComments = (props) => {
     }
     const fetchPosts = async () => {
         const response = await getAllDiscussionPosts();
-        console.log(response.data);
+        console.log(response.data.posts);
         if (response.data) {
-            setPostsData(response.data)
+            setPostsData(response.data.posts)
         }
 
 
@@ -47,8 +49,8 @@ export const MessageComments = (props) => {
     const fetchComments = async () => {
         const response = await getAllDiscussionComments(state.token);
         console.log(response.data);
-        if (response.data) {
-            setCommentData(response.data)
+        if (response.data.comments) {
+            setCommentData(response.data.comments)
         }
         console.log(commentData, "discussionTopic")
 
@@ -57,18 +59,18 @@ export const MessageComments = (props) => {
     useEffect(() => {
         fetchComments();
         console.log(commentData, "comme")
-    }, [commentData]);
-  
+    }, []);
 
-    let temp = "";
+
+    // let temp = "";
     // if (props.title != undefined) {
-    temp = commentData.filter(a => a.postID === postsData._id)
-        // .map((comment) => {
+    // temp = commentData?.filter(a => a.postID === postsData._id)
+    // .map((comment) => {
 
-        //     console.log(comment.messageComment, "jk")
-        // })
+    //     console.log(comment.messageComment, "jk")
+    // })
 
-    console.log(temp, "yyyyyyyyyyyyyyyyyyyy")
+    // console.log(temp, "yyyyyyyyyyyyyyyyyyyy")
 
     const EventHandlerClick = (i) => {
         setSelectedItem(i)
@@ -220,17 +222,7 @@ export const MessageComments = (props) => {
                                         className="btn btn-info border-radius-0  m-0 w-25">Share Your Post</button>
 
                                 </div>
-                                <div className="btn-group">
-                                    <button id="btnGroupDrop1" type="button" className="btn btn-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
-                                        aria-expanded="false">
-                                        <i className="fa fa-globe"></i>
-                                    </button>
-                                    <div className="dropdown-menu dropdown-menu-right" aria-labelledby="btnGroupDrop1">
-                                        <a className="dropdown-item" href="#"><i className="fa fa-globe"></i> Public</a>
-                                        <a className="dropdown-item" href="#"><i className="fa fa-users"></i> Friends</a>
-                                        <a className="dropdown-item" href="#"><i className="fa fa-user"></i> Just me</a>
-                                    </div>
-                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -244,13 +236,15 @@ export const MessageComments = (props) => {
                         </div>
                         <ul class="list-group">
                             <li class="list-group-item">
-                                {postsData.map((item, i) => {
+                                {postsData?.length > 0 && postsData?.map((item, i) => {
                                     return (<>
                                         <div class="row toggle" key={i} data-toggle="detail-1">
                                             <div class="col-xs-10" onClick={() => EventHandlerClick(i)}>
                                                 {item?.subject}
                                             </div>
-                                            <div class="col-xs-2"><i class="fa fa-chevron-down pull-right"></i></div>
+                                            <div class="col-xs-2" ><AiFillEdit /></div>
+                                            <div class="col-xs-2"><AiFillDelete /></div>
+
                                         </div>
                                     </>)
 
@@ -270,28 +264,18 @@ export const MessageComments = (props) => {
                                                                 <img className="rounded-circle" width="45" src="https://picsum.photos/50/50" alt="" />
                                                             </div>
                                                             <div className="ml-2">
-                                                                <div className="h5 m-0">@LeeCross</div>
-                                                                <div className="h7 text-muted">Miracles Lee Cross</div>
+                                                                <div className="h5 m-0">@ {postsData[selectedItem]?.user.username}</div>
+                                                                {/* <div className="h7 text-muted">Miracles Lee Cross</div> */}
                                                             </div>
                                                         </div>
                                                         <div>
-                                                            <div className="dropdown">
-                                                                <button className="btn btn-link dropdown-toggle" type="button" id="gedf-drop1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                    <i className="fa fa-ellipsis-h"></i>
-                                                                </button>
-                                                                <div className="dropdown-menu dropdown-menu-right" aria-labelledby="gedf-drop1">
-                                                                    <div className="h6 dropdown-header">Configuration</div>
-                                                                    <a className="dropdown-item" href="#">Save</a>
-                                                                    <a className="dropdown-item" href="#">Hide</a>
-                                                                    <a className="dropdown-item" href="#">Report</a>
-                                                                </div>
-                                                            </div>
+
                                                         </div>
                                                     </div>
 
                                                 </div>
                                                 <div className="card-body">
-                                                    <div className="text-muted h7 mb-2"> <i className="fa fa-clock-o"></i>10 min ago</div>
+
                                                     <a className="card-link" href="#">
                                                     </a>
 
@@ -304,23 +288,25 @@ export const MessageComments = (props) => {
 
                                             </div>
 
-                                           
+
                                             <div className="commentBox" >
                                                 <ul className="list-unstyled">
-                                                {commentData.filter(filtereddata=>filtereddata.postID===postsData[selectedItem]._id).map((msg) =>{
-                                                     return <li><span className="profileBox">M</span>
-                                                      <span className="profileText">
-                                                          <p>{msg.messageComment}</p>
+                                                    {commentData?.length > 0 && commentData?.filter(filtereddata => filtereddata.postID === postsData[selectedItem]._id).map((msg) => {
+                                                        return <li>
+                                                            <span className="profileBox">{msg.user.username}</span>
+
+                                                            <span className="profileText">
+                                                                <p>{msg.messageComment}</p>
 
 
 
 
-                                                      </span>
+                                                            </span>
 
-                                                  </li>
+                                                        </li>
                                                     }
                                                     )}
-                                                    
+
 
                                                     {/* <li><span className="profileBox">M</span>
                                                         <span className="profileText">
@@ -345,7 +331,7 @@ export const MessageComments = (props) => {
 
                                                         onKeyDown={e => submitComment(e, postsData[selectedItem]?._id)}
                                                         placeholder="What are you thinking?"></textarea></span>
-                                                        <span class="profileBox">L</span> </li>
+                                                        <span class="profileBox">{postsData[selectedItem]?.user.username}</span> </li>
 
                                                 </ul>
                                             </div>

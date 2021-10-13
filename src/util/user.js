@@ -26,6 +26,9 @@ export const deletePost = (id, token) => {
 export const signin = (params) => {
   return api.post("/user/signin", params);
 };
+export const forgetPass = (params) => {
+  return api.put("/user/forgot-password", params);
+};
 export const register = (params) => {
   return api.post("/user/signup", params, {
     headers: {

@@ -4,6 +4,7 @@ import Register from "./register";
 import { Switch, Route } from "react-router-dom";
 import { Navbar, NavbarBrand, Container, Link, Nav } from 'react-bootstrap'
 import Login from "./login";
+import ForgetPass from "./forgetPassword"
 
 // import Login from "./components/login/login";
 // import SimpleForm from "./chatbot/chatbot"
@@ -47,6 +48,7 @@ class Authentication extends React.Component {
 
             {isLogginActive && (
               <Login containerRef={ref => (this.current = ref)} />
+              
             )}
             {!isLogginActive && (
               <Register containerRef={ref => (this.current = ref)} />

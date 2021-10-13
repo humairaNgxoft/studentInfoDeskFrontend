@@ -3,7 +3,10 @@ import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import TableRow from "./TableRow"
 import { Table } from 'react-bootstrap';
-import { Card, Button, Form, Container } from 'react-bootstrap';
+import { api } from "../util/api";
+
+
+import { Modal, Button, Form, Container } from 'react-bootstrap';
 import { getAllDiscussionPosts, eletePost, getAllDiscussionComments } from "../util/user"
 
 import { AuthContext } from "../service/authentication";
@@ -13,39 +16,92 @@ export default function RequestPage() {
 
     const [requests, setRequests] = useState(
         [
-            { id: 1, value: "Alabama", somethig: "xsncmns" },
-            { id: 2, value: "Georgia", somethig: "xsncmns" },
-            { id: 3, value: "Tennessee", somethig: "xsncmns" }
+
         ]
     )
-    const authContext = useContext(AuthContext);
 
+    const { state } = useContext(AuthContext);
+
+
+
+    const [show, setShow] = useState(false);
+    const [reply, setReply] = useState('')
+    const [commentData, setCommentData] = useState([])
+
+    const [activeItemId, setActiveItemId] = useState(0)
+    const handleClose = () => setShow(false);
+    // const handleShow = () => setShow(true);
+    const openModalWithItem = (item) => {
+        setShow(true);
+        setActiveItemId(item._id)
+    }
+    const submitComment = async (e, postID) => {
+
+        e.preventDefault();
+
+        const params =
+        {
+            reply: reply,
+            postID
+        }
+        console.log(params)
+        const response = await api.post("/user/addComment", params, {
+            headers: {
+                "Content-Type": "application/json",
+                auth: state.token,
+            },
+        }
+        );
+
+        if (response.data.success) {
+            console.log("user registered successfully");
+            // history.push("/blogs");
+        } else {
+            console.log(response.data.error.message);
+        }
+
+    }
+
+
+    const fetchComments = async () => {
+        const response = await getAllDiscussionComments(state.token);
+        console.log(response.data);
+        if (response.data.comments) {
+            setCommentData(response.data.comments)
+        }
+        console.log(commentData, "discussionTopic")
+
+
+    };
+    useEffect(() => {
+        fetchComments();
+        console.log(commentData, "comme")
+    }, []);
+    const getrequestsData = async () => {
+        const response = await getAllDiscussionPosts();
+        console.log(response, "????????????");
+        if (response.data.posts) {
+            setRequests(response.data.posts)
+        }
+    }
     console.log(requests)
     useEffect(() => {
         getrequestsData()
 
-    }, [requests])
+    }, [])
 
-    const getrequestsData = async () => {
-        const response = await getAllDiscussionPosts();
-        console.log(response.data);
-        if (response.data) {
-            setRequests(response.data)
-        }
-    }
+    // const tabRow = () => {
 
-    const tabRow = () => {
+    //     requests.map((object, i) => {
+    //         // console.log(object, "dss")
+    //         return (<TableRow obj={object}
+    //             // getrequestsData={getrequestsData}
+    //             key={i} />);
 
-        requests.map((object, i) => {
-            // console.log(object, "dss")
-            return (<TableRow obj={object}
-                // getrequestsData={getrequestsData}
-                key={i} />);
+    //     }
+    //     )
 
-        }
-        )
-
-    }
+    // }
 
     // if (!state.isAuthenticated) {
     //     return <Redirect to="/" />;
@@ -77,13 +133,15 @@ export default function RequestPage() {
                                     <table className="table table-filter">
 
                                         <tbody >
-                                            {requests.map((req, i) => {
+                                            {requests?.length > 0 && requests?.map((req, i) => {
                                                 return (
                                                     <tr data-status="pagado" key={i} >
                                                         <td>
                                                             <div className="ckbox">
-                                                                <input type="checkbox" id="checkbox1" />
-                                                                <label for="checkbox1"></label>
+                                                                <input type="checkbox"
+                                                                // defaultChecked={this.state.chkbox} 
+                                                                // onChange={this.handleChangeChk}
+                                                                />
                                                             </div>
                                                         </td>
                                                         <td>
@@ -93,7 +151,7 @@ export default function RequestPage() {
                                                         </td>
                                                         <td>
 
-                                                            <div className="media" >
+                                                            <div className="media" onClick={() => openModalWithItem(req)} >
                                                                 {/* <a href="#" className="pull-left">
                                                                 <img src="https://s3.amazonaws.com/uifaces/faces/twitter/fffabs/128.jpg" className="media-photo" />
                                                             </a> */}
@@ -119,6 +177,48 @@ export default function RequestPage() {
                         </div>
 
                     </div>
+                    <Modal
+
+                        activeItemId={activeItemId}
+                        show={show}
+                        onHide={handleClose}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>admin reply</Modal.Title>
+
+
+                        </Modal.Header>
+
+                        <Modal.Body>
+                            {commentData?.length > 0 && commentData?.filter(filtereddata => filtereddata.postID === activeItemId).map((msg) => {
+                                //    console.log(msg,"jjj")
+                                return <p>{msg.user.username}:{msg.messageComment}</p>
+                            }
+                            )}
+
+                            <input type="text" className="form-control"
+                                id="comment"
+                                name="comment"
+                                onChange={e => setReply(e.target.value)}
+                                placeholder="Enter your reply"
+                                required />
+
+                            {/* <textarea
+                                className="form-control"
+                                // id="query"
+                                rows="2"
+                                onChange={e => console.log(e.target.value)}
+
+                                onKeyDown={e => submitComment(e, activeItemId)}
+                                placeholder="What are you thinking?"></textarea> */}
+                            {/* 36302-5471989-3
+issue date:27 9 2012 */}
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="primary" onClick={e => submitComment(e, activeItemId)}>
+                                Send Reply
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
                 </section>
             </Container>
         </div>

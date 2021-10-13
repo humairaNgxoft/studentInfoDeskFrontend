@@ -14,7 +14,7 @@ import Register from "./components/login/register"
 import SimpleForm from "./chatbot/chatbot"
 import { Posts } from "./components/Posts";
 import { DisplayPosts } from "./components/DisplayPosts"
-import About from "./components/About";
+import NewsFeed from "./components/About";
 import { UpdatePost } from "./components/UpdatePost"
 import { useHistory } from 'react-router-dom';
 import { getAllPosts } from "./util/user"
@@ -23,7 +23,8 @@ import TableRow from "./components/TableRow"
 import Footer from "./components/Footer/footer";
 import "./components/Footer/footer.scss"
 import FormView from "./components/FormView"
-import {MessageComments} from "./components/MessageComments"
+import { MessageComments } from "./components/MessageComments"
+import PasswordForgotten from "./components/login/forgetPassword"
 
 
 function App() {
@@ -123,7 +124,7 @@ function App() {
                 <Nav.Link href="/chatbot">Chatbot</Nav.Link>
                 {/* <Nav.Link href="/UpdatePost"></Nav.Link> */}
                 {/* <Nav.Link href="/"></Nav.Link> */}
-                <Nav.Link href="/blogs">Blogs</Nav.Link>
+                <Nav.Link href="/blogs">News Feed</Nav.Link>
                 <Nav.Link href="/requests">Requests</Nav.Link>
                 <Nav.Link href="/reviews"> Detailed Comments </Nav.Link>
                 <Nav.Link onClick={handleLogout}>Log Out</Nav.Link>
@@ -132,8 +133,8 @@ function App() {
               </Nav>
             </Container>
           </Navbar>
-        ) }
-         {authContext.state.isAuthenticated && authContext?.state?.user?.role === "user" && (
+        )}
+        {authContext.state.isAuthenticated && authContext?.state?.user?.role === "user" && (
           <Navbar bg="primary" variant="dark">
             <Container>
               <Navbar.Brand href="#home">Student Information System</Navbar.Brand>
@@ -141,9 +142,9 @@ function App() {
 
                 <Nav.Link href="/displayPosts">Display Posts</Nav.Link>
                 <Nav.Link href="/chatbot">Chatbot</Nav.Link>
-                <Nav.Link href="/blogs">Blogs</Nav.Link>
+                <Nav.Link href="/blogs">News Feed</Nav.Link>
                 <Nav.Link href="/reviews"> Detailed Comments </Nav.Link>
-               
+
                 <Nav.Link onClick={handleLogout}>Log Out</Nav.Link>
 
 
@@ -157,19 +158,23 @@ function App() {
             <Route exact path="/">
               <Authentication />
             </Route>
+
             <Route exact path="/addPost">
               <Posts />
             </Route>
             <Route exact path="/displayPosts">
               <DisplayPosts data={postsData} />
             </Route>
+          
             <Route exact path="/blogs">
-              <About data={postsData} />
+              <NewsFeed data={postsData} />
             </Route>
             <Route exact path="/chatbot">
               < SimpleForm />
             </Route>
-
+            <Route exact path="/forgetpass">
+              < PasswordForgotten />
+            </Route>
             <Route exact path="/requests" >
               <RequestPage />
             </Route>

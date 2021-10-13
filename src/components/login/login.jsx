@@ -3,15 +3,18 @@ import loginImg from "../../login.svg";
 import { signin } from "../../util/user";
 import { AuthContext } from "../../service/authentication";
 import { Redirect } from "react-router-dom";
-
+import { useHistory } from 'react-router-dom';
 const Login = (props) => {
   const authContext = useContext(AuthContext);
   const [redirect, setRedirect] = useState(false);
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-
+  let history = useHistory();
   const { containerRef } = props;
+  const handleSubmitPass = () => {
+    history.push('/forgetpass')
+  }
   const handleSubmit = async () => {
     const frmdetails = {
       email: email,
@@ -37,7 +40,7 @@ const Login = (props) => {
 
 
   if (redirect || authContext.state.isAuthenticated) {
-    return( <Redirect to="/blogs" />);
+    return (<Redirect to="/blogs" />);
   } else {
     return (
       <div className="base-container" ref={containerRef}>
@@ -68,6 +71,12 @@ const Login = (props) => {
             onClick={handleSubmit}
           >
             Login
+          </button>
+
+          <button type="button" className="btn"
+            onClick={handleSubmitPass}
+          >
+            Forget Password ?
           </button>
         </div>
       </div>
